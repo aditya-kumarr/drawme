@@ -1,3 +1,4 @@
+import styled from "@emotion/styled"
 import { MantineProvider, Text } from '@mantine/core';
 
 export default function App() {
@@ -7,3 +8,6 @@ export default function App() {
     </MantineProvider>
   );
 }
+const Container = styled.div`
+   
+`
