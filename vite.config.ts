@@ -17,8 +17,8 @@ export default defineConfig({
         short_name: "Drawme",
         description: "Website description(Could be same with index.html file)",
         theme_color: "#ffffff",
-        start_url: "http://localhost:5173/drawme/",
-        scope: "http://localhost:5173/drawme/",
+        start_url: "https://aditya-kumarr.github.io/drawme/",
+        scope: "https://aditya-kumarr.github.io/drawme/",
         icons: [
           {
             src: "pwa-192x192.png",
