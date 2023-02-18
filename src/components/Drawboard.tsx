@@ -19,8 +19,8 @@ const Drawboard = () => {
 
     useEffect(() => {
         const canvas = canvasRef.current!
-        canvas.width = 800
-        canvas.height = 800
+        canvas.width = window.innerWidth > 600 ? 1200 : 600
+        canvas.height = window.innerWidth > 600 ? 1200 : 600
         const context = canvas.getContext("2d")!;
         context.lineWidth = strokeWidth
         context.scale(2, 2)
@@ -45,7 +45,29 @@ const Drawboard = () => {
     const draw = ({ nativeEvent }: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
         if (!isDrawing) return
         const { offsetX, offsetY } = nativeEvent;
-        console.log(offsetX, offsetY)
+        const path = paths[paths.length - 1].path;
+        path.lineTo(offsetX, offsetY)
+        contextRef.current.stroke(path)
+        setPaths([...paths.slice(0, -1), { color: colorValue, path, width: strokeWidth }])
+    }
+
+    const touchStartHandler = (e: any) => {
+        const { x, y, width, height } = e.target.getBoundingClientRect();
+        const offsetX = (e.touches[0].clientX - x) / width * e.target.offsetWidth;
+        const offsetY = (e.touches[0].clientY - y) / height * e.target.offsetHeight;
+        const path = new Path2D();
+        contextRef.current.strokeStyle = colorValue;
+        contextRef.current.lineWidth = strokeWidth;
+        setPaths([...paths, { color: colorValue, path, width: strokeWidth }])
+        path.moveTo(offsetX, offsetY)
+        setIsDrawing(true)
+
+    }
+    const touchMoveHandler = (e: any) => {
+        if (!isDrawing) return
+        const { x, y, width, height } = e.target.getBoundingClientRect();
+        const offsetX = (e.touches[0].clientX - x) / width * e.target.offsetWidth;
+        const offsetY = (e.touches[0].clientY - y) / height * e.target.offsetHeight;
         const path = paths[paths.length - 1].path;
         path.lineTo(offsetX, offsetY)
         contextRef.current.stroke(path)
@@ -79,8 +101,8 @@ const Drawboard = () => {
 
     return (<>
         <Container pt="lg">
-            <Flex direction={window.innerWidth > 786 ? "row" : "column"} gap="lg">
-                <Canvas ref={canvasRef} onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={finishDrawing} />
+            <Paper component={Flex} shadow="lg" p="lg" direction={window.innerWidth > 786 ? "row" : "column"} gap="lg">
+                <Canvas onTouchStart={e => touchStartHandler(e)} onTouchMove={touchMoveHandler} onTouchEnd={finishDrawing} ref={canvasRef} onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={finishDrawing} />
                 <Paper component={Flex} direction="column" gap="lg" justify="center" align="center" >
                     <ColorPicker format="rgba" value={colorValue} onChange={setColorValue} />
                     <Slider w={"100%"} value={strokeWidth} onChange={setStrokeWidth} />
@@ -90,7 +112,7 @@ const Drawboard = () => {
                         <Button onClick={downloadImage}>Download</Button>
                     </Paper>
                 </Paper>
-            </Flex>
+            </Paper>
         </Container>
     </>)
 }
@@ -99,9 +121,12 @@ const Canvas = styled.canvas`
     border:1px solid gray;
     /* cursor:url("https://yt3.ggpht.com/ytc/AL5GRJUWLlTSCLw1EsLDtLTTZNWeAzV3HJWEKNUYXTd9Nw=s88-c-k-c0x00ffffff-no-rj"),auto; */
     cursor:pointer;
-    width:400px;
-    height:400px;
-
+    width:300px;
+    height:300px;
+    @media only screen and (min-width: 600px) {
+        width:600px;
+        height:600px
+    }
 `
 
 export default Drawboard
