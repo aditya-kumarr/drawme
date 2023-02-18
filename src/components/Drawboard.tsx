@@ -1,15 +1,20 @@
 import styled from "@emotion/styled";
-import { ColorInput, ColorPicker, Input } from "@mantine/core";
-import { useInputState } from "@mantine/hooks";
+import { Button, ColorInput, ColorPicker, Container, Flex, Input, Paper, Slider } from "@mantine/core";
+import { useInputState, useHotkeys } from "@mantine/hooks";
 import { MutableRefObject, useEffect, useRef, useState } from "react"
+
+type Path = { color: string, path: Path2D, width: number }[]
 
 const Drawboard = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const contextRef = useRef() as MutableRefObject<CanvasRenderingContext2D>;
     const [isDrawing, setIsDrawing] = useState(false)
     const [colorValue, setColorValue] = useInputState("#000")
-    const [paths, setPaths] = useState<Array<{ color: string, path: Path2D, width: number }>>([])
-    const [strokeWidth, setStrokeWidth] = useInputState(10);
+    const [paths, setPaths] = useState<Path>([])
+    const [strokeWidth, setStrokeWidth] = useState(10);
+    useHotkeys([
+        ['ctrl+Z', undo],
+    ]);
 
     useEffect(() => {
         const canvas = canvasRef.current!
@@ -52,13 +57,26 @@ const Drawboard = () => {
             contextRef.current.lineWidth = width
             contextRef.current.stroke(path);
         })
-    }, [colorValue, strokeWidth])
+    }, [colorValue, strokeWidth, paths])
+
+    function undo() {
+        setPaths((prev: Path) => {
+            return prev.filter((path, i, array) => i !== array.length - 1)
+        })
+    }
 
 
     return (<>
-        <Canvas ref={canvasRef} onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={finishDrawing} />
-        <ColorPicker format="rgba" value={colorValue} onChange={setColorValue} />
-        <Input value={strokeWidth} onChange={setStrokeWidth} />
+        <Container pt="lg">
+            <Flex direction="row" gap="lg">
+                <Canvas ref={canvasRef} onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={finishDrawing} />
+                <Paper component={Flex} direction="column" gap="lg" justify="center" align="center" >
+                    <ColorPicker format="rgba" value={colorValue} onChange={setColorValue} />
+                    <Slider w={"100%"} value={strokeWidth} onChange={setStrokeWidth} />
+                    <Button w={100} onClick={undo}>Undo</Button>
+                </Paper>
+            </Flex>
+        </Container>
     </>)
 }
 
