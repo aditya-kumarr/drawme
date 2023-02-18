@@ -8,8 +8,12 @@
     "build": "tsc && vite build",
     "preview": "vite preview --host"
   },
+  "resolutions": {
+    "styled-components": "^5"
+  },
   "dependencies": {
     "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
     "@mantine/core": "^5.10.4",
     "@mantine/hooks": "^5.10.4",
     "react": "^18.2.0",
