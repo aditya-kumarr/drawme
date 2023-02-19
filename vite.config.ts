@@ -1,9 +1,16 @@
 import { defineConfig } from "vite";
+import fs from "fs";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
-
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    https: {
+      key: fs.readFileSync("./.cert/key.pem"),
+      cert: fs.readFileSync("./.cert/cert.pem"),
+    },
+    host: "192.168.43.66",
+  },
   plugins: [
     react(),
     VitePWA({
@@ -17,8 +24,8 @@ export default defineConfig({
         short_name: "Drawme",
         description: "Website description(Could be same with index.html file)",
         theme_color: "#ffffff",
-        start_url: "http://localhost:5173/drawme/",
-        scope: "http://localhost:5173/drawme/",
+        start_url: "https://192.168.43.66:5173/drawme/",
+        scope: "https://192.168.43.66:5173/drawme/",
         icons: [
           {
             src: "pwa-192x192.png",
